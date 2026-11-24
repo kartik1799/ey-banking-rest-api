@@ -11,6 +11,7 @@ const endpoint = process.env.DYNAMODB_ENDPOINT || "http://localhost:8000";
 const region = process.env.AWS_REGION || "us-east-1";
 const customersTable = process.env.CUSTOMERS_TABLE || "Customers";
 const accountsTable = process.env.ACCOUNTS_TABLE || "Accounts";
+const usersTable = process.env.USERS_TABLE || "Users";
 
 const client = new DynamoDBClient({
   region,
@@ -67,6 +68,13 @@ async function main() {
         Projection: { ProjectionType: "ALL" },
       },
     ],
+    BillingMode: "PAY_PER_REQUEST",
+  });
+
+  await recreateTable(usersTable, {
+    TableName: usersTable,
+    AttributeDefinitions: [{ AttributeName: "username", AttributeType: "S" }],
+    KeySchema: [{ AttributeName: "username", KeyType: "HASH" }],
     BillingMode: "PAY_PER_REQUEST",
   });
 

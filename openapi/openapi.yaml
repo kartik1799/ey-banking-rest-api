@@ -17,6 +17,7 @@ tags:
   - name: Customers
   - name: Accounts
   - name: Transactions
+  - name: Authentication
 
 paths:
   /customers:
@@ -48,6 +49,8 @@ paths:
       tags: [Customers]
       summary: Get a customer by id
       operationId: getCustomer
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/customerId"
       responses:
@@ -65,6 +68,8 @@ paths:
       tags: [Accounts]
       summary: Create an account for a customer
       operationId: createAccount
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/customerId"
       requestBody:
@@ -92,6 +97,8 @@ paths:
       tags: [Accounts]
       summary: List accounts for a customer
       operationId: listAccounts
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/customerId"
       responses:
@@ -109,6 +116,8 @@ paths:
       tags: [Accounts]
       summary: Get an account (includes balance)
       operationId: getAccount
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/accountId"
       responses:
@@ -126,6 +135,8 @@ paths:
       tags: [Transactions]
       summary: Deposit funds (stretch)
       operationId: deposit
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/accountId"
       requestBody:
@@ -154,6 +165,8 @@ paths:
       tags: [Transactions]
       summary: Withdraw funds (stretch)
       operationId: withdraw
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/accountId"
       requestBody:
@@ -184,6 +197,8 @@ paths:
       tags: [Transactions]
       summary: Transfer between accounts (stretch)
       operationId: transfer
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -209,7 +224,68 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
 
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register a username for an existing customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, customerId, accountId]
+              properties:
+                username: { type: string, minLength: 4, maxLength: 40 }
+                password: { type: string, minLength: 12, writeOnly: true }
+                customerId: { type: string }
+                accountId: { type: string }
+      responses:
+        "201": { description: User registered }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Authenticate and issue JWTs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, accountId]
+              properties:
+                username: { type: string }
+                password: { type: string, writeOnly: true }
+                accountId: { type: string }
+      responses:
+        "200": { description: Access and refresh tokens issued }
+        "401": { description: Invalid credentials }
+  /auth/refresh:
+    post:
+      tags: [Authentication]
+      summary: Issue a new token pair from a valid refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+      responses:
+        "200": { description: New token pair issued }
+        "401": { description: Invalid or expired refresh token }
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   parameters:
     customerId:
       name: customerId

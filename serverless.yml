@@ -48,6 +48,27 @@ functions:
           path: openapi.yaml
           method: get
 
+  authRegister:
+    handler: src/handlers/auth.register
+    events:
+      - http:
+          path: auth/register
+          method: post
+
+  authLogin:
+    handler: src/handlers/auth.login
+    events:
+      - http:
+          path: auth/login
+          method: post
+
+  authRefresh:
+    handler: src/handlers/auth.refresh
+    events:
+      - http:
+          path: auth/refresh
+          method: post
+
   createCustomer:
     handler: src/handlers/customers.create
     events:
@@ -56,50 +77,49 @@ functions:
           method: post
 
   getCustomer:
-    handler: src/handlers/customers.get
+    handler: src/handlers/customers.getProtected
     events:
       - http:
           path: customers/{customerId}
           method: get
 
   createAccount:
-    handler: src/handlers/accounts.create
+    handler: src/handlers/accounts.createProtected
     events:
       - http:
           path: customers/{customerId}/accounts
           method: post
 
   listAccounts:
-    handler: src/handlers/accounts.list
+    handler: src/handlers/accounts.listProtected
     events:
       - http:
           path: customers/{customerId}/accounts
           method: get
 
   getAccount:
-    handler: src/handlers/accounts.get
+    handler: src/handlers/accounts.getProtected
     events:
       - http:
           path: accounts/{accountId}
           method: get
 
-  # Optional stretch goals — stubs included for mid-senior candidates
   deposit:
-    handler: src/handlers/transactions.deposit
+    handler: src/handlers/transactions.depositProtected
     events:
       - http:
           path: accounts/{accountId}/deposits
           method: post
 
   withdraw:
-    handler: src/handlers/transactions.withdraw
+    handler: src/handlers/transactions.withdrawProtected
     events:
       - http:
           path: accounts/{accountId}/withdrawals
           method: post
 
   transfer:
-    handler: src/handlers/transactions.transfer
+    handler: src/handlers/transactions.transferProtected
     events:
       - http:
           path: transfers

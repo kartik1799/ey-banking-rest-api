@@ -1,5 +1,7 @@
 "use strict";
 
+require("./load-env");
+
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient } = require("@aws-sdk/lib-dynamodb");
 
@@ -24,6 +26,7 @@ const docClient = DynamoDBDocumentClient.from(client, {
 const TABLES = {
   customers: process.env.CUSTOMERS_TABLE || "Customers",
   accounts: process.env.ACCOUNTS_TABLE || "Accounts",
+  users: process.env.USERS_TABLE || "Users",
 };
 
 module.exports = {
